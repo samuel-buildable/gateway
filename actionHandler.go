@@ -71,8 +71,12 @@ func (handler *actionHandler) sendReponse(logger *log.Entry, result moleculer.Pa
 		response.WriteHeader(errorStatusCode)
 		json = jsonSerializer.PayloadToBytes(payload.Empty().Add("error", result.Error().Error()))
 	} else {
-		if statusCode != nil && statusCode.Int() != 0 && statusCode.Int() != succesStatusCode {
-			response.WriteHeader(statusCode.Int())
+		if statusCode != nil {
+			if statusCode.Int() != 0 && statusCode.Int() != succesStatusCode {
+				response.WriteHeader(statusCode.Int())
+			} else {
+				response.WriteHeader(succesStatusCode)
+			}
 		} else {
 			response.WriteHeader(succesStatusCode)
 		}
