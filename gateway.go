@@ -10,7 +10,6 @@ import (
 	"regexp"
 
 	"github.com/gorilla/mux"
-	"github.com/imdario/mergo"
 	"github.com/moleculer-go/moleculer"
 	"github.com/moleculer-go/moleculer/payload"
 	"github.com/moleculer-go/moleculer/serializer"
@@ -87,10 +86,6 @@ func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string
 // paramsFromRequest extract params from body and URL into a payload.
 func paramsFromRequest(request *http.Request, logger *log.Entry) moleculer.Payload {
 	mvalues, err := paramsFromRequestForm(request, logger)
-
-	headers := make(map[string]interface{})
-	headers["$header"] = request.Header
-	mergo.Merge(&mvalues, headers)
 
 	if len(mvalues) > 0 {
 		return payload.New(mvalues)
@@ -180,7 +175,7 @@ func filterActions(context moleculer.Context, settings map[string]interface{}, s
 }
 
 var defaultRoutes = []map[string]interface{}{
-	map[string]interface{}{
+	{
 		"path": "/",
 
 		//whitelist filter used to filter the list of actions.

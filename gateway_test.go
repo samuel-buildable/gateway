@@ -173,7 +173,7 @@ var _ = Describe("API Gateway", func() {
 		})
 	})
 
-	Describe("sendReponse", func() {
+	Describe("sendResponse", func() {
 		It("should convert result into JSON and send in the reponse with success status code", func() {
 			result := map[string]interface{}{
 				"name":     "John",
@@ -184,7 +184,7 @@ var _ = Describe("API Gateway", func() {
 
 			response := &mockReponseWriter{header: map[string][]string{}}
 			ah := actionHandler{}
-			ah.sendReponse(log.WithField("test", ""), payload.New(result), response)
+			ah.sendResponse(log.WithField("test", ""), payload.New(result), response)
 			json := response.String()
 			Expect(gjson.Get(json, "category").String()).Should(Equal("Bastart"))
 			Expect(gjson.Get(json, "lastName").String()).Should(Equal("Snow"))
@@ -197,7 +197,7 @@ var _ = Describe("API Gateway", func() {
 		It("should convert error result into JSON and send in the reponse with error status code", func() {
 			response := &mockReponseWriter{header: map[string][]string{}}
 			ah := actionHandler{}
-			ah.sendReponse(log.WithField("test", ""), payload.New(errors.New("Some error...")), response)
+			ah.sendResponse(log.WithField("test", ""), payload.New(errors.New("Some error...")), response)
 			json := response.String()
 			Expect(gjson.Get(json, "error").String()).Should(Equal("Some error..."))
 			Expect(response.statusCode).Should(Equal(errorStatusCode))

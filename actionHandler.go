@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/imdario/mergo"
 	"github.com/moleculer-go/moleculer"
 	"github.com/moleculer-go/moleculer/payload"
 	log "github.com/sirupsen/logrus"
@@ -54,16 +55,15 @@ func (handler *actionHandler) invalidHttpMethodError(logger *log.Entry, response
 	for methodName := range methods {
 		acceptedMethods = append(acceptedMethods, methodName)
 	}
-	error := fmt.Errorf("Invalid HTTP Method - accepted methods: %s", acceptedMethods)
-	handler.sendReponse(logger, payload.New(error), response)
+	error := fmt.Errorf("invalid HTTP Method - accepted methods: %s", acceptedMethods)
+	handler.sendResponse(logger, payload.New(error), response)
 }
 
 var succesStatusCode = 200
 var errorStatusCode = 500
-var resultParseErrorStatusCode = 500
 
-// sendReponse send the result payload  back using the ResponseWriter
-func (handler *actionHandler) sendReponse(logger *log.Entry, result moleculer.Payload, response http.ResponseWriter) {
+// sendResponse send the result payload  back using the ResponseWriter
+func (handler *actionHandler) sendResponse(logger *log.Entry, result moleculer.Payload, response http.ResponseWriter) {
 	var json []byte
 	statusCode := result.Get("$statusCode", 200)
 
@@ -86,22 +86,31 @@ func (handler *actionHandler) sendReponse(logger *log.Entry, result moleculer.Pa
 func (handler *actionHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	methods := handler.acceptedMethods()
 	logger := handler.context.Logger()
+
+	headers := map[string]interface{}{}
+	headers["$headers"] = request.Header
+	params := paramsFromRequest(request, logger)
+
+	mergo.Merge(&params, headers)
+
+	fmt.Println("params: ", params)
+
 	switch request.Method {
 	case http.MethodGet:
 		if methods["GET"] {
-			handler.sendReponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
 		}
 	case http.MethodPost:
 		if methods["POST"] {
-			handler.sendReponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
 		}
 	case http.MethodPut:
 		if methods["PUT"] {
-			handler.sendReponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
 		}
 	case http.MethodDelete:
 		if methods["DELETE"] {
-			handler.sendReponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
 		}
 	default:
 		handler.invalidHttpMethodError(logger, response, methods)
