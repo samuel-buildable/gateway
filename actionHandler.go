@@ -66,20 +66,16 @@ var resultParseErrorStatusCode = 500
 func (handler *actionHandler) sendReponse(logger *log.Entry, result moleculer.Payload, response http.ResponseWriter) {
 	var json []byte
 	statusCode := result.Get("$statusCode")
+	if statusCode == nil {
+		statusCode = payload.New(succesStatusCode)
+	}
 	response.Header().Add("Content-Type", "application/json")
 	if result.IsError() {
 		response.WriteHeader(errorStatusCode)
 		json = jsonSerializer.PayloadToBytes(payload.Empty().Add("error", result.Error().Error()))
 	} else {
-		if statusCode != nil {
-			if statusCode.Int() != 0 && statusCode.Int() != succesStatusCode {
-				response.WriteHeader(statusCode.Int())
-			} else {
-				response.WriteHeader(succesStatusCode)
-			}
-		} else {
-			response.WriteHeader(succesStatusCode)
-		}
+		response.WriteHeader(statusCode.Int())
+
 		//remove the $statusCode from the payload
 		newResult := result.Remove("$statusCode")
 
