@@ -67,6 +67,13 @@ func validMethod(method string) bool {
 func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string]interface{}, error) {
 	params := map[string]interface{}{}
 	err := request.ParseForm()
+	headers := map[string]interface{}{}
+
+	for key, value := range request.Header {
+		headers[key] = value
+	}
+	params["$headers"] = headers
+
 	if err != nil {
 		logger.Error("Error calling request.ParseForm() -> ", err)
 		return nil, err

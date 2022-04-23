@@ -1,4 +1,4 @@
-module github.com/moleculer-go/gateway
+module github.com/buildable/gateway
 
 go 1.12
 
