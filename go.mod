@@ -35,4 +35,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
 
-replace github.com/moleculer-go/gateway => github.com/buildable/gateway latest
+replace github.com/moleculer-go/gateway => github.com/buildable/gateway v0.0.2
