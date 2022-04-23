@@ -74,8 +74,6 @@ func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string
 		headers[key] = value
 	}
 
-	mergo.Merge(&params, headers)
-
 	if err != nil {
 		logger.Error("Error calling request.ParseForm() -> ", err)
 		return nil, err
@@ -87,6 +85,7 @@ func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string
 			params[name] = value
 		}
 	}
+	mergo.Merge(&params, headers)
 	return params, nil
 }
 
