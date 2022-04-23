@@ -1,4 +1,4 @@
-module github.com/buildable/gateway
+module github.com/samuel-buildable/gateway
 
 go 1.12
 
