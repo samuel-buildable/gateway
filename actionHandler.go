@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/imdario/mergo"
 	"github.com/moleculer-go/moleculer"
 	"github.com/moleculer-go/moleculer/payload"
 	log "github.com/sirupsen/logrus"
@@ -89,28 +88,23 @@ func (handler *actionHandler) ServeHTTP(response http.ResponseWriter, request *h
 
 	headers := map[string]interface{}{}
 	headers["$headers"] = request.Header
-	params := paramsFromRequest(request, logger)
-
-	mergo.Merge(&params, headers)
-
-	fmt.Println("params: ", params)
 
 	switch request.Method {
 	case http.MethodGet:
 		if methods["GET"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, payload.New(paramsFromRequest(request, logger)).AddMany(headers)), response)
 		}
 	case http.MethodPost:
 		if methods["POST"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, payload.New(paramsFromRequest(request, logger)).AddMany(headers)), response)
 		}
 	case http.MethodPut:
 		if methods["PUT"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, payload.New(paramsFromRequest(request, logger)).AddMany(headers)), response)
 		}
 	case http.MethodDelete:
 		if methods["DELETE"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, paramsFromRequest(request, logger)), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, payload.New(paramsFromRequest(request, logger)).AddMany(headers)), response)
 		}
 	default:
 		handler.invalidHttpMethodError(logger, response, methods)
