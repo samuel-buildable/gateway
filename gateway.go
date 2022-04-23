@@ -10,7 +10,6 @@ import (
 	"regexp"
 
 	"github.com/gorilla/mux"
-	"github.com/imdario/mergo"
 	"github.com/moleculer-go/moleculer"
 	"github.com/moleculer-go/moleculer/payload"
 	"github.com/moleculer-go/moleculer/serializer"
@@ -85,7 +84,7 @@ func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string
 			params[name] = value
 		}
 	}
-	mergo.Merge(&params, headers)
+	/* mergo.Merge(&params, headers) */
 	return params, nil
 }
 
