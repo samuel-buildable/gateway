@@ -6,16 +6,14 @@ on:
     workflows: ["Pre-release"]
     types:
       - "completed"
-
-# Automatically create a GitHub release when a new tag is pushed to the main branch
 jobs:
   release:
-    name: "Build Latest"
     runs-on: ubuntu-latest
     steps:
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Create GitHub release
+        uses: Roang-zero1/github-create-release-action@master
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: false
-          title: "Build"
+          version_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
