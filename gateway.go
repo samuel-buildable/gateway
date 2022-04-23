@@ -10,6 +10,7 @@ import (
 	"regexp"
 
 	"github.com/gorilla/mux"
+	"github.com/imdario/mergo"
 	"github.com/moleculer-go/moleculer"
 	"github.com/moleculer-go/moleculer/payload"
 	"github.com/moleculer-go/moleculer/serializer"
@@ -72,7 +73,8 @@ func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string
 	for key, value := range request.Header {
 		headers[key] = value
 	}
-	params["$headers"] = headers
+
+	mergo.Merge(&params, headers)
 
 	if err != nil {
 		logger.Error("Error calling request.ParseForm() -> ", err)
