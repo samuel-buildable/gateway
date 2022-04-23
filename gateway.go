@@ -10,6 +10,7 @@ import (
 	"regexp"
 
 	"github.com/gorilla/mux"
+	"github.com/imdario/mergo"
 	"github.com/moleculer-go/moleculer"
 	"github.com/moleculer-go/moleculer/payload"
 	"github.com/moleculer-go/moleculer/serializer"
@@ -67,11 +68,6 @@ func validMethod(method string) bool {
 func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string]interface{}, error) {
 	params := map[string]interface{}{}
 	err := request.ParseForm()
-	headers := map[string]interface{}{}
-
-	for key, value := range request.Header {
-		headers[key] = value
-	}
 
 	if err != nil {
 		logger.Error("Error calling request.ParseForm() -> ", err)
@@ -84,13 +80,18 @@ func paramsFromRequestForm(request *http.Request, logger *log.Entry) (map[string
 			params[name] = value
 		}
 	}
-	/* mergo.Merge(&params, headers) */
+	/*  */
 	return params, nil
 }
 
 // paramsFromRequest extract params from body and URL into a payload.
 func paramsFromRequest(request *http.Request, logger *log.Entry) moleculer.Payload {
 	mvalues, err := paramsFromRequestForm(request, logger)
+
+	headers := make(map[string]interface{})
+	headers["$header"] = request.Header
+	mergo.Merge(&mvalues, headers)
+
 	if len(mvalues) > 0 {
 		return payload.New(mvalues)
 	}
