@@ -1,4 +1,4 @@
-name: Git Version
+name: "Pre-release"
 
 on:
   push:
