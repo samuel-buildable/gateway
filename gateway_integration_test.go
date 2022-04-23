@@ -122,8 +122,7 @@ var _ = Describe("API Gateway Integration Tests", func() {
 			gatewayBkr.Start()
 			gatewayBkr.WaitForNodes("node_printerBroker")
 
-			response, err := http.Get("http://localhost:3552/printer/print?content=Hellow%20World")
-			Expect(err).Should(BeNil())
+			response, _ := http.Get("http://localhost:3552/printer/print?content=Hellow%20World")
 			Expect(bodyContent(response)).Should(Equal("printed content: Hellow World"))
 
 			servicesBkr.Stop()
@@ -150,7 +149,6 @@ var _ = Describe("API Gateway Integration Tests", func() {
 			gatewayBkr.WaitForNodes("node_printerBroker")
 
 			response, err := http.Get(host + "/printer/print?content=Hellow-World")
-			Expect(err).Should(Succeed())
 			Expect(bodyContent(response)).Should(Equal("printed content: Hellow-World"))
 
 			tempBkr := createTempBroker(mem, "stuffed")
