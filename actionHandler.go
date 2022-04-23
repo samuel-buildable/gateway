@@ -77,8 +77,9 @@ func (handler *actionHandler) sendReponse(logger *log.Entry, result moleculer.Pa
 			response.WriteHeader(succesStatusCode)
 		}
 		//remove the $statusCode from the payload
-		result.Remove("$statusCode")
-		json = jsonSerializer.PayloadToBytes(result)
+		newResult := result.Remove("$statusCode")
+
+		json = jsonSerializer.PayloadToBytes(newResult)
 	}
 	logger.Debug("Gateway SendReponse() - action: ", handler.action, " json: ", string(json), " result.IsError(): ", result.IsError())
 	response.Write(json)
