@@ -102,13 +102,7 @@ func (handler *actionHandler) ServeHTTP(response http.ResponseWriter, request *h
 		"$secure":  request.TLS != nil,
 	}
 
-	params := payload.New(paramsFromRequest(request, logger))
-
-	if params.IsError() || params == nil || params.Len() == 0 {
-		params = payload.New(headers)
-	} else {
-		params.AddMany(headers)
-	}
+	params := payload.New(paramsFromRequest(request, logger)).AddMany(headers)
 
 	switch request.Method {
 	case http.MethodGet:
