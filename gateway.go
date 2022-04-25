@@ -170,6 +170,7 @@ func filterActions(context moleculer.Context, settings map[string]interface{}, s
 		for _, actionHand := range createActionHandlers(route, filteredActions) {
 			result = append(result, actionHand)
 		}
+
 	}
 	return result
 }

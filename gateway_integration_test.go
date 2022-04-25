@@ -201,19 +201,3 @@ func bodyContent(resp *http.Response) string {
 	Expect(err).Should(Succeed())
 	return string(bts)
 }
-
-func waitAction(path string, gatewaySvc *gateway.HttpService) chan bool {
-	res := make(chan bool)
-	go func() {
-		for {
-			for _, ap := range gatewaySvc.ActionPaths() {
-				if path == ap {
-					res <- true
-					return
-				}
-			}
-			time.Sleep(time.Microsecond)
-		}
-	}()
-	return res
-}
