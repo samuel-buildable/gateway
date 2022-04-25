@@ -104,10 +104,10 @@ func (handler *actionHandler) ServeHTTP(response http.ResponseWriter, request *h
 
 	params := payload.New(paramsFromRequest(request, logger))
 
-	if params == nil {
+	if params.IsError() || params == nil || params.Len() == 0 {
 		params = payload.New(headers)
 	} else {
-		params = params.AddMany(headers)
+		params.AddMany(headers)
 	}
 
 	switch request.Method {
