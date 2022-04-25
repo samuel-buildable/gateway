@@ -91,30 +91,28 @@ func (handler *actionHandler) ServeHTTP(response http.ResponseWriter, request *h
 
 	params := payload.New(paramsFromRequest(request, logger))
 
-	mergedParams := payload.New(paramsFromRequest(request, logger))
-
 	if !params.IsMap() {
-		mergedParams = payload.New(headers)
+		params = payload.New(headers)
 	} else {
-		mergedParams = mergedParams.AddMany(headers)
+		params.AddMany(headers)
 	}
 
 	switch request.Method {
 	case http.MethodGet:
 		if methods["GET"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, mergedParams), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, params), response)
 		}
 	case http.MethodPost:
 		if methods["POST"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, mergedParams), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, params), response)
 		}
 	case http.MethodPut:
 		if methods["PUT"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, mergedParams), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, params), response)
 		}
 	case http.MethodDelete:
 		if methods["DELETE"] {
-			handler.sendResponse(logger, <-handler.context.Call(handler.action, mergedParams), response)
+			handler.sendResponse(logger, <-handler.context.Call(handler.action, params), response)
 		}
 	default:
 		handler.invalidHttpMethodError(logger, response, methods)
