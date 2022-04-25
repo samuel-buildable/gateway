@@ -64,9 +64,10 @@ var errorStatusCode = 500
 // sendResponse send the result payload  back using the ResponseWriter
 func (handler *actionHandler) sendResponse(logger *log.Entry, result moleculer.Payload, response http.ResponseWriter) {
 	var json []byte
-	statusCode := result.Get("$statusCode", 200)
+	statusCode := result.Get("$meta").Get("$status", 200)
+	contentType := result.Get("$meta").Get("$contentType", "application/json").String()
 
-	response.Header().Add("Content-Type", "application/json")
+	response.Header().Add("Content-Type", contentType)
 	if result.IsError() {
 		response.WriteHeader(errorStatusCode)
 		json = jsonSerializer.PayloadToBytes(payload.Empty().Add("error", result.Error().Error()))
@@ -74,7 +75,7 @@ func (handler *actionHandler) sendResponse(logger *log.Entry, result moleculer.P
 		response.WriteHeader(statusCode.Int())
 
 		//remove the $statusCode from the payload
-		newResult := result.Remove("$statusCode")
+		newResult := result.Remove("$meta")
 
 		json = jsonSerializer.PayloadToBytes(newResult)
 	}
@@ -87,14 +88,26 @@ func (handler *actionHandler) ServeHTTP(response http.ResponseWriter, request *h
 	logger := handler.context.Logger()
 
 	headers := map[string]interface{}{}
-	headers["$headers"] = request.Header
+	headers["$meta"] = map[string]interface{}{
+		"$method":  request.Method,
+		"$path":    request.URL.Path,
+		"$headers": request.Header,
+		"$params":  request.URL.Query(),
+		"$body":    request.Body,
+		"$remote":  request.RemoteAddr,
+		"$host":    request.Host,
+		"$url":     request.URL,
+		"$proto":   request.Proto,
+		"$tls":     request.TLS,
+		"$secure":  request.TLS != nil,
+	}
 
 	params := payload.New(paramsFromRequest(request, logger))
 
-	if !params.IsMap() {
+	if params == nil {
 		params = payload.New(headers)
 	} else {
-		params.AddMany(headers)
+		params = params.AddMany(headers)
 	}
 
 	switch request.Method {
