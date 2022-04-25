@@ -255,6 +255,17 @@ func populateActionsRouter(context moleculer.Context, settings map[string]interf
 		router.Handle(path, actionHand)
 		paths = append(paths, path)
 	}
+
+	// TODO: rename populateActionsRouter function or put this in separate function
+	// TODO: make this customizable and make it so it doesn't conflict with user defined routes
+	assets := settings["assets"].(map[string]interface{})
+	if assets["folder"] != nil {
+		router.Handle("/", http.FileServer(http.Dir(assets["folder"].(string))))
+		router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, assets["folder"].(string)+"/favicon.ico")
+		})
+	}
+
 	return paths
 }
 
